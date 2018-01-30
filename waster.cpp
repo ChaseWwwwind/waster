@@ -5,27 +5,14 @@
 #define read(var) (std::cout << "    > "); (std::cin >> var)
 #define byte unsigned char
 
-bool should_terminate = false;
+int current_thread_id = 0;
 std::mutex mutex;
-void WasteCPU()
+void WasteCPU(int thread_id)
 {
-	int a = 2;
-	int b = 2;
-	int c = 2;
-	int d = 2;
 	while (true)
 	{
-		a = a * 2;
-		b = b * 2;
-		c = c * 2;
-		d = d * 2;
-		a = a / 2;
-		b = b / 2;
-		c = c / 2;
-		d = d / 2;
-
 		std::lock_guard<std::mutex> guard(mutex);
-		if (should_terminate)
+		if (current_thread_id != thread_id)
 			return;
 	}
 }
@@ -42,11 +29,8 @@ struct _1MB
 
 int main()
 {
-	print("waster v0.1");
+	print("waster v0.2");
 	print("");
-
-	std::thread ** threads = nullptr;
-	int threads_count = 0;
 
 	_1MB ** allocations = nullptr;
 	int allocations_count = 0;
@@ -72,23 +56,7 @@ int main()
 		else if (input == '1')
 		{
 			mutex.lock();
-			should_terminate = true;
-			mutex.unlock();
-
-			if (threads_count > 0)
-			{
-				for (int i = 0; i < threads_count; i++)
-				{
-					threads[i]->join();
-					delete threads[i];
-				}
-				delete[] threads;
-				threads = nullptr;
-				threads_count = 0;
-			}
-
-			mutex.lock();
-			should_terminate = false;
+			current_thread_id++;
 			mutex.unlock();
 
 			int count;
@@ -96,14 +64,10 @@ int main()
 			read(count);
 			print("");
 
-			if (count > 0)
+			for (int i = 0; i < count; i++)
 			{
-				threads = new std::thread*[count];
-				threads_count = count;
-				for (int i = 0; i < count; i++)
-				{
-					threads[i] = new std::thread(WasteCPU);
-				}
+				std::thread thread = std::thread(WasteCPU, current_thread_id);
+				thread.detach();
 			}
 		}
 		else if (input == '2')
