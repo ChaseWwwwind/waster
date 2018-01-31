@@ -1,13 +1,15 @@
 #include <iostream>
 #include <thread>
 #include <mutex>
+
 #define print(msg) (std::cout << msg << '\n')
 #define read(var) (std::cout << "    > "); (std::cin >> var)
 #define byte unsigned char
 
 int current_thread_id = 0;
 std::mutex mutex;
-void WasteCPU(int thread_id)
+
+void WasteThread(int thread_id)
 {
 	while (true)
 	{
@@ -55,23 +57,27 @@ int main()
 		}
 		else if (input == '1')
 		{
+			// stop the previous threads
 			mutex.lock();
 			current_thread_id++;
 			mutex.unlock();
 
+			// get the new threads count from user
 			int count;
 			print("How many threads of CPU to waste?");
 			read(count);
 			print("");
 
+			// create the new threads
 			for (int i = 0; i < count; i++)
 			{
-				std::thread thread = std::thread(WasteCPU, current_thread_id);
+				std::thread thread = std::thread(WasteThread, current_thread_id);
 				thread.detach();
 			}
 		}
 		else if (input == '2')
 		{
+			// free up the previously allocated memory
 			if (allocations_count > 0)
 			{
 				for (int i = 0; i < allocations_count; i++)
@@ -83,11 +89,13 @@ int main()
 				allocations_count = 0;
 			}
 
+			// get the new allocation size from user
 			int count;
 			print("How many MBs of RAM to waste?");
 			read(count);
 			print("");
 
+			// allocate
 			if (count > 0)
 			{
 				allocations = new _1MB*[count];
