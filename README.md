@@ -9,7 +9,7 @@ Each time you're asked to enter one of the following numbers:
   - 2\. Waste RAM
 
 Entering 1 stops currently running threads and asks how many new threads to create.
-Entering 2 clears currently allocated memory and asks how any MBs to allocate next.
+Entering 2 clears currently allocated memory and asks how many MBs to allocate next.
 
 # Tip
 64-bit build works better!
